@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct No {
     int vertice;
@@ -51,18 +52,88 @@ void imprimirGrafo(Grafo* grafo) {
     }
 }
 
-int main() {
-    int n = 7;  
-    int arestas[7][2] = {{0, 1}, {1, 2}, {2, 0}, {3, 4}, {4, 5}, {5, 6}, {6, 3}};
-    int tamanhoArestas = sizeof(arestas) / sizeof(arestas[0]);
+void lerArestas(Grafo* grafo) {
+    char entrada[1024];
+    printf("Digite as arestas no formato [[0,1],[1,2],...]: ");
+    scanf(" %[^\n]", entrada);
 
+    char* token = strtok(entrada, "[],");
+
+    int src, dest;
+    while (token != NULL) {
+        src = atoi(token);       
+        token = strtok(NULL, "[],");
+        if (token != NULL) {
+            dest = atoi(token);  
+            adicionarAresta(grafo, src, dest);
+            token = strtok(NULL, "[],");
+        }
+    }
+}
+
+void bfs(Grafo* grafo, int start) {
+    int* queue = malloc(grafo->numVertices * sizeof(int));
+    int* visited = calloc(grafo->numVertices, sizeof(int));
+    int front = 0, rear = 0;
+
+    queue[rear++] = start;
+    visited[start] = 1;
+
+    printf("Visitando nos a partir do no %d: ", start);
+
+    while (front < rear) {
+        int current = queue[front++];
+        printf("%d ", current); 
+
+        No* temp = grafo->listaAdj[current];
+        while (temp) {
+            int neighbor = temp->vertice;
+
+            if (!visited[neighbor]) {
+                visited[neighbor] = 1;
+                queue[rear++] = neighbor;
+            }
+            temp = temp->proximo;
+        }
+    }
+    printf("\n");
+
+    free(queue);
+    free(visited);
+}
+
+int findShortestCycle(int n, int** arestas, int tamanhoArestas, int* colSizeArestas) {
     Grafo* grafo = criarGrafo(n);
 
     for (int i = 0; i < tamanhoArestas; i++) {
         adicionarAresta(grafo, arestas[i][0], arestas[i][1]);
     }
 
+    //chama bfs 
+
+    return -1;
+}
+
+
+int main() {
+    int n;
+    
+    printf("Digite o numero de vertices: ");
+    scanf("%d", &n);
+
+    Grafo* grafo = criarGrafo(n);
+
+    lerArestas(grafo);
+
+    printf("Grafo:\n");
     imprimirGrafo(grafo);
+
+    printf("Executando BFS:\n");
+    
+    for(int v = 0; v < n; v++){
+        bfs(grafo, v);
+    }
+    
 
     for (int i = 0; i < n; i++) {
         No* temp = grafo->listaAdj[i];
