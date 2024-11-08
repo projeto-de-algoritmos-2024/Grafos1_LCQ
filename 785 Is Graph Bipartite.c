@@ -28,6 +28,7 @@ fila *desenfileira(fila *fi) {
     }
     fila *aux = fi;
     fi = fi->prox;   
+    free(aux);  
     return fi;
 }
 
@@ -42,8 +43,6 @@ void BFS(int *lista_adj, int no_inicio, int num_vertices) {
     fila = enfileira(fila, no_inicio);
     visitado[no_inicio] = true;
 
-    printf("Caminho feito: ");
-
     while (!fila_vazia(fila)) {
         int vertice = fila->dado;
         printf("%d ", vertice);
@@ -56,37 +55,65 @@ void BFS(int *lista_adj, int no_inicio, int num_vertices) {
             }
         }
     }
-    printf("\n");
+}
+
+bool isBipartite(int** graph, int graphSize, int* graphColSize) {
+    int* cores = malloc(graphSize * sizeof(int));  
+
+    for (int i = 0; i < graphSize; i++) {
+        cores[i] = -1; 
+    }
+
+    fila* fila = NULL;
+
+    for (int i = 0; i < graphSize; i++) {
+        if (cores[i] == -1) {  
+            fila = enfileira(fila, i);
+            cores[i] = 0; 
+
+            while (!fila_vazia(fila)) {
+                int vertice = fila->dado;
+                fila = desenfileira(fila);
+
+                for (int j = 0; j < graphSize; j++) {
+                    if (graph[vertice][j] == 1) {  
+                        if (cores[j] == -1) {  
+                            cores[j] = 1 - cores[vertice];  
+                            fila = enfileira(fila, j);
+                        } else if (cores[j] == cores[vertice]) {
+                            free(cores);
+                            return false;  
+                        }
+                    }
+                }
+            }
+        }
+    }
+    free(cores);
+    return true;  
 }
 
 int main() {
-    int num_vertices, num_arestas, no_inicio;;
+    int tamanhodografo = 4;
+    int colunas[4] = {4, 4, 4, 4};  
+    int graph[4][4] = {
+        {0, 1, 0, 1},
+        {1, 0, 1, 0},
+        {0, 1, 0, 1},
+        {1, 0, 1, 0}
+    };
 
-    printf("numero de nos: ");
-    scanf("%d", &num_vertices);
-
-    int *lista_adj = malloc(num_vertices * num_vertices * sizeof(int));
-    for (int i = 0; i < num_vertices * num_vertices; i++) {
-        lista_adj[i] = 0;
+    int** teste = malloc(tamanhodografo * sizeof(int*));
+    for (int i = 0; i < tamanhodografo; i++) {
+        teste[i] = graph[i];
     }
 
-    printf("numero de arestas: ");
-    scanf("%d", &num_arestas);
-    
-    printf("Digite as arestas:\n");
-    for (int i = 0; i < num_arestas; i++) {
-        int v1, v2;
-        printf("Aresta %d: ", i + 1);
-        scanf("%d %d", &v1, &v2);
-
-        lista_adj[v1 * num_vertices + v2] = 1;
-        lista_adj[v2 * num_vertices + v1] = 1;
+    bool resultado = isBipartite(teste, tamanhodografo, colunas);
+    if (resultado == true) {
+        printf("O grafo é bipartido.\n");
+    } else {
+        printf("O grafo não é bipartido.\n");
     }
-    
-    printf("no inicial: ");
-    scanf("%d", &no_inicio);
-
-    BFS(lista_adj, no_inicio, num_vertices);
 
     return 0;
 }
