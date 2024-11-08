@@ -71,37 +71,3 @@ bool isBipartite(int** graph, int graphSize, int* graphColSize) {
     return true;
 }
 
-int main() {
-    char input[1000];
-    printf("Digite:\n");
-    fgets(input, sizeof(input), stdin);
-
-    int tamanho_do_grafo = 0;
-    int graphColSize[100];
-    int** grafo = malloc(100 * sizeof(int*));
-
-    int vertice = 0; 
-    for (int i = 0; input[i]; i++) {
-        if (input[i] == '[') {
-            int i = 0;
-            while (input[++i] != ']') {
-                if (input[i] >= '0' && input[i] <= '9') {
-                    grafo[vertice] = realloc(grafo[vertice], ++i * sizeof(int));
-                    grafo[vertice][i - 1] = input[i] - '0';
-                }
-            }
-            graphColSize[vertice] = i;
-            vertice++;
-        }
-    }
-
-    tamanho_do_grafo = vertice;
-
-    if (isBipartite(grafo, tamanho_do_grafo, graphColSize)) {
-        printf("true\n");
-    } else {
-        printf("false\n");
-    }
-
-    return 0;
-}
