@@ -1,34 +1,31 @@
-#include <stdbool.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 
 typedef struct fila {
     int dado;
     struct fila *prox;
 } fila;
 
-fila *enfileira(fila *fi, int x) {
+fila* enfileira(fila *fi, int x) {
     fila *novo = malloc(sizeof(fila));
     novo->dado = x;
     novo->prox = NULL;
     if (fi == NULL) {
-        return novo;  
+        return novo;
     }
     fila *aux = fi;
-    while (aux->prox != NULL) {  
-        aux = aux->prox;
-    }
+    while (aux->prox) aux = aux->prox;
     aux->prox = novo;
     return fi;
 }
 
-fila *desenfileira(fila *fi) {
-    if (fi == NULL) {
-        return NULL;
-    }
+fila* desenfileira(fila *fi) {
+    if (!fi) return NULL;
     fila *aux = fi;
-    fi = fi->prox;   
-    free(aux);  
+    fi = fi->prox;
+    free(aux);
     return fi;
 }
 
@@ -36,83 +33,74 @@ bool fila_vazia(fila *fi) {
     return fi == NULL;
 }
 
-void BFS(int *lista_adj, int no_inicio, int num_vertices) {
-    bool visitado[1000] = {false};
-
+bool bfs(int vertice, int** graph, int* graphColSize, int cores[]) {
     fila *fila = NULL;
-    fila = enfileira(fila, no_inicio);
-    visitado[no_inicio] = true;
+    fila = enfileira(fila, vertice);
+    cores[vertice] = 0;
 
     while (!fila_vazia(fila)) {
-        int vertice = fila->dado;
-        printf("%d ", vertice);
+        int atual = fila->dado;
         fila = desenfileira(fila);
 
-        for (int i = 0; i < num_vertices; i++) {
-            if (lista_adj[vertice * num_vertices + i] == 1 && !visitado[i]) {
-                fila = enfileira(fila, i);
-                visitado[i] = true;
+        for (int i = 0; i < graphColSize[atual]; i++) {
+            int vizinho = graph[atual][i];
+            if (cores[vizinho] == -1) {
+                cores[vizinho] = 1 - cores[atual];
+                fila = enfileira(fila, vizinho);
+            } else if (cores[vizinho] == cores[atual]) {
+                return false;
             }
         }
     }
+    return true;
 }
 
 bool isBipartite(int** graph, int graphSize, int* graphColSize) {
-    int* cores = malloc(graphSize * sizeof(int));  
-
+    int cores[graphSize];
     for (int i = 0; i < graphSize; i++) {
-        cores[i] = -1; 
+        cores[i] = -1;
     }
 
-    fila* fila = NULL;
-
     for (int i = 0; i < graphSize; i++) {
-        if (cores[i] == -1) {  
-            fila = enfileira(fila, i);
-            cores[i] = 0; 
-
-            while (!fila_vazia(fila)) {
-                int vertice = fila->dado;
-                fila = desenfileira(fila);
-
-                for (int j = 0; j < graphSize; j++) {
-                    if (graph[vertice][j] == 1) {  
-                        if (cores[j] == -1) {  
-                            cores[j] = 1 - cores[vertice];  
-                            fila = enfileira(fila, j);
-                        } else if (cores[j] == cores[vertice]) {
-                            free(cores);
-                            return false;  
-                        }
-                    }
-                }
+        if (cores[i] == -1) {
+            if (!bfs(i, graph, graphColSize, cores)) {
+                return false;
             }
         }
     }
-    free(cores);
-    return true;  
+    return true;
 }
 
 int main() {
-    int tamanhodografo = 4;
-    int colunas[4] = {4, 4, 4, 4};  
-    int graph[4][4] = {
-        {0, 1, 0, 1},
-        {1, 0, 1, 0},
-        {0, 1, 0, 1},
-        {1, 0, 1, 0}
-    };
+    char input[1000];
+    printf("Digite:\n");
+    fgets(input, sizeof(input), stdin);
 
-    int** teste = malloc(tamanhodografo * sizeof(int*));
-    for (int i = 0; i < tamanhodografo; i++) {
-        teste[i] = graph[i];
+    int tamanho_do_grafo = 0;
+    int graphColSize[100];
+    int** grafo = malloc(100 * sizeof(int*));
+
+    int vertice = 0; 
+    for (int i = 0; input[i]; i++) {
+        if (input[i] == '[') {
+            int i = 0;
+            while (input[++i] != ']') {
+                if (input[i] >= '0' && input[i] <= '9') {
+                    grafo[vertice] = realloc(grafo[vertice], ++i * sizeof(int));
+                    grafo[vertice][i - 1] = input[i] - '0';
+                }
+            }
+            graphColSize[vertice] = i;
+            vertice++;
+        }
     }
 
-    bool resultado = isBipartite(teste, tamanhodografo, colunas);
-    if (resultado == true) {
-        printf("O grafo é bipartido.\n");
+    tamanho_do_grafo = vertice;
+
+    if (isBipartite(grafo, tamanho_do_grafo, graphColSize)) {
+        printf("true\n");
     } else {
-        printf("O grafo não é bipartido.\n");
+        printf("false\n");
     }
 
     return 0;
