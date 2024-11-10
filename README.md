@@ -50,7 +50,8 @@ Para utilizar as soluções propostas basta acessar no repositório o arquivo, c
 |Nível|Link|
 |:---:|:--:|
 |Difícil|[2608. Shortest Cycle in a Graph](https://leetcode.com/problems/shortest-cycle-in-a-graph/description/)|
-
+|Difícil|[2360. Longest Cycle in a Graph](https://leetcode.com/problems/longest-cycle-in-a-graph/description/)|
+|Médio|[785. Is Graph Bipartite?](leetcode.com/problems/is-graph-bipartite/description/)|
 
 
 
