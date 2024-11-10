@@ -39,28 +39,6 @@ int desempilhar(pilha *p) {
     return valor;
 }
 
-void dfs(int *aresta, int numVertices, int inicio) {
-    pilha p;
-    criandoPilha(&p);
-
-    int *visitado = (int *)malloc(numVertices * sizeof(int));
-    for (int i = 0; i < numVertices; i++) visitado[i] = 0;
-
-    empilhar(&p, inicio);
-    visitado[inicio] = 1;
-
-    while (!pilhaVazia(&p)) {
-        int atual = desempilhar(&p);
-        printf("%d ", atual);
-
-        int prox = aresta[atual];
-        if (prox != -1 && !visitado[prox]) {
-            empilhar(&p, prox);
-            visitado[prox] = 1;
-        }
-    }
-}
-
 int longestCycle(int *edges, int edgesSize) {
     int ciclo_longo = -1;
     int *visitado = (int *)calloc(edgesSize, sizeof(int));  
