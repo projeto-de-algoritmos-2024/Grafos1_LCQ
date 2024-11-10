@@ -36,13 +36,16 @@ int desempilhar(pilha *p) {
     int valor = aux->valor;
     p->topo = aux->prox;
     p->cont--;
+    free(aux);  
     return valor;
 }
 
 int longestCycle(int *edges, int edgesSize) {
     int ciclo_longo = -1;
-    int *visitado = (int *)calloc(edgesSize, sizeof(int));  
+    int *visitado = (int *)calloc(edgesSize, sizeof(int)); 
     int *mapa_profun = (int *)malloc(edgesSize * sizeof(int));  
+    pilha p;  
+    criandoPilha(&p);
 
     for (int i = 0; i < edgesSize; i++) {
         if (visitado[i] != 0) continue;  
@@ -52,17 +55,20 @@ int longestCycle(int *edges, int edgesSize) {
 
         while (no != -1) {
             if (visitado[no] == 2) break;  
-            if (visitado[no] == 1) {       
-                int tam_ciclo = passo - mapa_profun[no]; 
+
+            if (visitado[no] == 1) {  
+                int tam_ciclo = passo - mapa_profun[no];  
                 if (tam_ciclo > ciclo_longo) {
-                    ciclo_longo = tam_ciclo;        
+                    ciclo_longo = tam_ciclo;  
                 }
                 break;
             }
 
-            visitado[no] = 1;
-            mapa_profun[no] = passo++;
-            no = edges[no];
+            visitado[no] = 1;  
+            mapa_profun[no] = passo;  
+            empilhar(&p, no);  
+            no = edges[no];    
+            passo++;          
         }
 
         no = i;
@@ -70,6 +76,13 @@ int longestCycle(int *edges, int edgesSize) {
             visitado[no] = 2;
             no = edges[no];
         }
+
+        while (!pilhaVazia(&p)) {
+            desempilhar(&p);
+        }
     }
+
+    free(visitado);
+    free(mapa_profun);
     return ciclo_longo;
 }
