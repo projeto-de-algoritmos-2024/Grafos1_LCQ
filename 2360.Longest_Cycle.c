@@ -29,13 +29,12 @@ void empilhar(pilha *p, int x) {
 }
 
 int desempilhar(pilha *p) {
-    if (pilha_vazia(p)) {
+    if (pilhaVazia(p)) {
         return -1;
     }
     no *aux = p->topo;
     int valor = aux->valor;
     p->topo = aux->prox;
-    free(aux);
     p->cont--;
     return valor;
 }
@@ -50,7 +49,7 @@ void dfs(int *aresta, int numVertices, int inicio) {
     empilhar(&p, inicio);
     visitado[inicio] = 1;
 
-    while (!pilha_vazia(&p)) {
+    while (!pilhaVazia(&p)) {
         int atual = desempilhar(&p);
         printf("%d ", atual);
 
@@ -62,12 +61,37 @@ void dfs(int *aresta, int numVertices, int inicio) {
     }
 }
 
-int main() {
-    int numVertices = 6;
-    int aresta[] = {-1, 2, 3, -1, 5, -1}; 
+int longestCycle(int *edges, int edgesSize) {
+    int ciclo_longo = -1;
+    int *visitado = (int *)calloc(edgesSize, sizeof(int));  
+    int *mapa_profun = (int *)malloc(edgesSize * sizeof(int));  
 
-    int inicio = 1; 
-    dfs(aresta, numVertices, inicio);
+    for (int i = 0; i < edgesSize; i++) {
+        if (visitado[i] != 0) continue;  
 
-    return 0;
+        int no = i;
+        int passo = 0;
+
+        while (no != -1) {
+            if (visitado[no] == 2) break;  
+            if (visitado[no] == 1) {       
+                int tam_ciclo = passo - mapa_profun[no]; 
+                if (tam_ciclo > ciclo_longo) {
+                    ciclo_longo = tam_ciclo;        
+                }
+                break;
+            }
+
+            visitado[no] = 1;
+            mapa_profun[no] = passo++;
+            no = edges[no];
+        }
+
+        no = i;
+        while (no != -1 && visitado[no] == 1) {
+            visitado[no] = 2;
+            no = edges[no];
+        }
+    }
+    return ciclo_longo;
 }
