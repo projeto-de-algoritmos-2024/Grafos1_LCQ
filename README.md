@@ -53,6 +53,10 @@ Para utilizar as soluções propostas basta acessar no repositório o arquivo, c
 |Difícil|[2360. Longest Cycle in a Graph](https://leetcode.com/problems/longest-cycle-in-a-graph/description/)|
 |Médio|[785. Is Graph Bipartite?](https://leetcode.com/problems/is-graph-bipartite/description/)|
 
+## Apresentação
+
+<p>Clique <a href="https://youtu.be/7Q9pjo93hcM" target="_blank">Aqui</a></p>
+
 
 
 
